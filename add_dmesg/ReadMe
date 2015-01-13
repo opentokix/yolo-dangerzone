@@ -3,6 +3,17 @@ quickly see when stuff happened, before and after your mark.
 
 Very easy, very dirty - but sometimes useful
 
+Prereq on debuntu: 
+apt-get install build-essential 
+
+Compile: 
+make 
+
+Usage:
+sudo insmod add_mark_to_dmesg.ko && sudo rmmod add_mark_to_dmesg
+
+You will get the following line your dmesg output: 
+
 Example: 
 [8927419.128178] -- MARK -- Added manually at: 2015-01-13 13:00:06
 
