@@ -9,7 +9,7 @@ int init_module(void)
     
     printk(KERN_INFO "-- MARK -- Added manually at: %ld-%02d-%02d %02d:%02d:%02d\n", 1900 + broken.tm_year, 
                                                                           broken.tm_mon + 1, 
-                                                                          broken.tm_yday, 
+                                                                          broken.tm_yday + 1, 
                                                                           broken.tm_hour, 
                                                                           broken.tm_min, 
                                                                           broken.tm_sec);
