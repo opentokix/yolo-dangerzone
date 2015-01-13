@@ -1,1 +1,0 @@
-cmd_/home/peter/src/yolo-dangerzone/add_dmesg/add_mark_to_dmesg.ko := ld -r -m elf_x86_64 -T /usr/src/linux-headers-3.13.0-32-generic/scripts/module-common.lds --build-id  -o /home/peter/src/yolo-dangerzone/add_dmesg/add_mark_to_dmesg.ko /home/peter/src/yolo-dangerzone/add_dmesg/add_mark_to_dmesg.o /home/peter/src/yolo-dangerzone/add_dmesg/add_mark_to_dmesg.mod.o
