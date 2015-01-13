@@ -1,0 +1,5 @@
+This is a tiny linux kernel module that will add a timestamp to your dmesg, so you will 
+quickly see when stuff happened, before and after your mark. 
+
+Very easy, very dirty - but sometimes useful
+
