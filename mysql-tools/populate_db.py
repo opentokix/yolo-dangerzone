@@ -50,7 +50,7 @@ def r_string(length):
 
 def generate_id():
 	"""
-	Get a very long int based on tiem since epoch
+	Get a very long int based on time since epoch
 	"""
 	# This will take time in nanoseconds, and present it as a large int
 	return int(time.time()*1000000)
@@ -67,7 +67,7 @@ def main():
 	"""
 
 	# Creating the database connection
-	connection = MySQLdb.connect (host = "127.0.0.1", user = "test", passwd = "army01", db = "test")
+	connection = MySQLdb.connect (host = "127.0.0.1", user = "test", passwd = "test", db = "test")
 
 	num = 100 #number of rows to add
 
