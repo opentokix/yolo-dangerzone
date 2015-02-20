@@ -67,7 +67,7 @@ def main():
 	"""
 
 	# Creating the database connection
-	connection = MySQLdb.connect (host = "127.0.0.1", user = "test", passwd = "test", db = "test")
+	connection = MySQLdb.connect (host = "127.0.0.1", user = "test", passwd = "army01", db = "test")
 
 	num = 100 #number of rows to add
 
@@ -87,7 +87,8 @@ def main():
 
 		for attempt_number in range(3): # Doing x attempts before throwing error
 			try:
-				cursor.execute("INSERT INTO test(data, data2) VALUES ('%d', '%s')" % (random.randint(1,9), random_data2))
+
+				cursor.execute("INSERT INTO test(data, data2) VALUES (%s, %s)",  (random.randint(1,9), random_data2))
 				connection.commit()
 				break
 			except MySQLdb.Error, e:
