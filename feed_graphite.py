@@ -6,20 +6,24 @@ import time
 import getopt
 import sys
 
+
 def usage():
     print """
     This program reads a value from stdin and sends to carbon server
 
     It has no built in looping function etc. So one example usage is:
 
-    while true; do ps ax |grep "php-fpm"|grep -v grep|wc -l|./feed_graphite.py -H 127.0.0.1 -p 2003 -d localhost.fpmnum; sleep 5; done
+    while true; do ps ax |grep "php-fpm"|grep -v grep|wc -l|./feed_graphite.py
+    -H 127.0.0.1 -p 2003 -d localhost.fpmnum; sleep 5; done
 
     options:
         -h help
         -H graphite hosts
         -p graphite server port (default: 2003)
-        -d graphite destination (foo.bar.baz) mandatory (default: i.forgot.something)
+        -d graphite destination (foo.bar.baz) mandatory
+        (default: i.forgot.something)
     """
+
 
 def dump_to_carbon(server, port, payload):
     sock = socket.socket()
@@ -60,7 +64,7 @@ def main(argv):
     for line in sys.stdin:
         line = float(line)
         if isinstance(line, (int, long, float)):
-            message = "%s %s %d\n" % (carbon_dest, line, int(time.time()) )
+            message = "%s %s %d\n" % (carbon_dest, line, int(time.time()))
             dump_to_carbon(carbon_host, carbon_port, message)
         else:
             sys.exit(1)
