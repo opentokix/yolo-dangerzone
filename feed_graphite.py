@@ -13,15 +13,15 @@ def usage():
 
     It has no built in looping function etc. So one example usage is:
 
-    while true; do ps ax |grep "php-fpm"|grep -v grep|wc -l|./feed_graphite.py
-    -H 127.0.0.1 -p 2003 -d localhost.fpmnum; sleep 5; done
+    while true; do ps ax |grep "php-fpm"|grep -v grep|wc -l| \
+    ./feed_graphite.py -H 127.0.0.1 -p 2003 -d localhost.fpmnum; sleep 5; done
 
     options:
         -h help
         -H graphite hosts
         -p graphite server port (default: 2003)
         -d graphite destination (foo.bar.baz) mandatory
-        (default: i.forgot.something)
+            (default: i.forgot.something)
     """
 
 
