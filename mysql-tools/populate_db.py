@@ -67,9 +67,9 @@ def main():
 	"""
 
 	# Creating the database connection
-	connection = MySQLdb.connect (host = "127.0.0.1", user = "test", passwd = "test", db = "test")
+	connection = MySQLdb.connect (host = "127.0.0.1", user = "test", passwd = "army01", db = "test")
 
-	num = 100 #number of rows to add
+	num = 10000 #number of rows to add
 
 	information = "Populating database with %d rows: " % (num) # some info on the conole
 	sys.stdout.write(information)
@@ -94,7 +94,7 @@ def main():
 			except MySQLdb.Error, e:
 				print "MySQL Error %d: %s" % (e.args[0], e.args[1])
 
-		time.sleep(.5) # Sleeping for half a second before each insert, this is not a benchmark
+		time.sleep(.01) # Sleeping for half a second before each insert, this is not a benchmark
 
 	cursor.close()
 	connection.close()
