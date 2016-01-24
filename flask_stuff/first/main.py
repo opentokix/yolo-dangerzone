@@ -5,15 +5,20 @@
 import hashlib
 import sqlite3
 import sys
+from OpenSSL import SSL
 from flask import Flask,request
 app = Flask(__name__)
 
-# SSL context
-from OpenSSL import SSL
-context = SSL.Context(SSL.SSLv23_METHOD)
-context.use_privatekey_file('ssl/main.key')
-context.use_certificate_file('ssl/main.crt')
 
+def setup_ssl():
+    try:
+        context = SSL.Context(SSL.SSLv23_METHOD)
+        context.use_privatekey_file("ssl/fakeserver.key")
+        context.use_certificate_file("ssl/fakeserver.crt")
+    except Exception,e:
+        print "Something happened in the ssl context, exiting...\nError: %s" % str(e)
+        sys.exit(2)
+    return context
 
 def read_db(username):
     con = sqlite3.connect('db/main.db')
@@ -60,6 +65,9 @@ def api():
             return "Hello %s, you are authorized and have uid: %d" % (name, uid)
         else:
             return "Wrong password"
+def main():
+    ssl = setup_ssl()
+    app.run(host='::', ssl_context=ssl)
 
 if __name__ == '__main__':
-    app.run(host='::', ssl_context=context)
+    main()
