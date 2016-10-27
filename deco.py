@@ -3,7 +3,7 @@ from functools import wraps
 import time
 
 global DEBUG
-DEBUG = False
+DEBUG = True
 
 def verbose(func):
     wraps(func)
