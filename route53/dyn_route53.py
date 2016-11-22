@@ -2,7 +2,7 @@
 """Tool to handle route53 hosted domains."""
 import configparser
 import boto3
-
+from subprocess import check_output
 
 def readconfig():
     """Read credentials and other optional config options."""
@@ -17,7 +17,8 @@ def readconfig():
         for k, v in config:
             print "key: %s value: %s" & (k, v)
     except:
-        continue
+        print "Config Error"
+        sys.exit(3)
 
     return conf
 
