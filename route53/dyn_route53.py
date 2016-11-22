@@ -20,7 +20,7 @@ def readconfig():
         config.read('/home/peter/credentials/route53_dyn.conf')
         domain = {}
         for k in config:
-            if k is not 'DEFAULT'
+            if k is not 'DEFAULT':
                 domain[k]['interface'] = config[k]['interface']
                 domain[k]['name'] = config[k]['name']
     except:
