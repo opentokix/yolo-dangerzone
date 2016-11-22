@@ -11,7 +11,7 @@ def readconfig():
     cred = configparser.ConfigParser()
     config = configparser.ConfigParser()
 
-    cred.read('/home/peter/credentials/aws.cred')
+    cred.read('/home/peter/credentials/route53.cred')
     if 'ROUTE53' in cred:
         conf['access_key'] = cred['ROUTE53']['access_key']
         conf['secret'] = cred['ROUTE53']['secret_access_key']
