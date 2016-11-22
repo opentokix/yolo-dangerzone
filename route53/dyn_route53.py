@@ -24,7 +24,7 @@ def readconfig():
                 print k
                 print config[k]
                 domain[k].append(config[k]['interface'])
-                domain[k].append(onfig[k]['name'])
+                domain[k].append(config[k]['name'])
     except:
         print sys.exc_info()[0]
         print "Config Error"
