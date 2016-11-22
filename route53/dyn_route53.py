@@ -3,6 +3,7 @@
 import configparser
 import boto3
 from subprocess import check_output
+import sys
 
 def readconfig():
     """Read credentials and other optional config options."""
