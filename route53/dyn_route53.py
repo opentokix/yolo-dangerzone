@@ -21,8 +21,8 @@ def readconfig():
         domain = {}
         for k in config:
             if k is not 'DEFAULT':
-                domain[k]['interface'] = config[k]['interface']
-                domain[k]['name'] = config[k]['name']
+                domain[k].append(config[k]['interface'])
+                domain[k].append(onfig[k]['name'])
     except:
         print sys.exc_info()[0]
         print "Config Error"
