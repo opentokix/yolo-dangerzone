@@ -18,13 +18,15 @@ def readconfig():
     try:
         config.read('/home/peter/credentials/route53_dyn.conf')
         for k in config:
+            domain[k]['interface'] = config[k]['interface']
+            domain[k]['name'] = config[k]['name']
             print "key: %s value:" % (k)
     except:
         print sys.exc_info()[0]
         print "Config Error"
         sys.exit(3)
 
-    return conf
+    return conf, domain
 
 
 def get_available_zones(route53):
@@ -61,12 +63,12 @@ def update_ot(route53, domain, record, ip):
 
 def main():
     """Main function."""
-    conf = readconfig()
+    conf, domains = readconfig()
     #route53 = boto3.client('route53',
                            #aws_access_key_id=conf['access_key'],
                            #aws_secret_access_key=conf['secret'])
     #response = update_ot(route53, 'meodo.com', 'foo', '185.35.77.26')
-    print conf
+    print conf, domains
 
 
 
