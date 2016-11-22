@@ -8,11 +8,13 @@ import sys
 def readconfig():
     """Read credentials and other optional config options."""
     conf = {'access_key': 'undefined', 'secret': 'undefined'}
+    cred = configparser.ConfigParser()
     config = configparser.ConfigParser()
-    config.read('/home/peter/credentials/aws.cred')
-    if 'ROUTE53' in config:
-        conf['access_key'] = config['ROUTE53']['access_key']
-        conf['secret'] = config['ROUTE53']['secret_access_key']
+
+    cred.read('/home/peter/credentials/aws.cred')
+    if 'ROUTE53' in cred:
+        conf['access_key'] = cred['ROUTE53']['access_key']
+        conf['secret'] = cred['ROUTE53']['secret_access_key']
     try:
         config.read('/home/peter/credentials/route53_dyn.conf')
         for k in config:
