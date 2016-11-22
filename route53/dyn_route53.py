@@ -15,8 +15,8 @@ def readconfig():
         conf['secret'] = config['ROUTE53']['secret_access_key']
     try:
         config.read('/home/peter/credentials/route53_dyn.conf')
-        for k, v in config:
-            print "key: %s value: %s" % (k, v)
+        for k in config:
+            print "key: %s value:" % (k)
     except:
         print sys.exc_info()[0]
         print "Config Error"
