@@ -17,7 +17,8 @@ def readconfig():
         config.read('/home/peter/credentials/route53_dyn.conf')
         for k, v in config:
             print "key: %s value: %s" & (k, v)
-    except:
+    except e:
+        print e
         print "Config Error"
         sys.exit(3)
 
