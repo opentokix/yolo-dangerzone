@@ -8,6 +8,7 @@ import sys
 def readconfig():
     """Read credentials and other optional config options."""
     conf = {'access_key': 'undefined', 'secret': 'undefined'}
+
     cred = configparser.ConfigParser()
     config = configparser.ConfigParser()
 
@@ -17,10 +18,11 @@ def readconfig():
         conf['secret'] = cred['ROUTE53']['secret_access_key']
     try:
         config.read('/home/peter/credentials/route53_dyn.conf')
+        domain = {}
         for k in config:
-            domain[k]['interface'] = config[k]['interface']
-            domain[k]['name'] = config[k]['name']
-            print "key: %s value:" % (k)
+            if k is not 'DEFAULT'
+                domain[k]['interface'] = config[k]['interface']
+                domain[k]['name'] = config[k]['name']
     except:
         print sys.exc_info()[0]
         print "Config Error"
