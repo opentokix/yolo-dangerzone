@@ -23,6 +23,7 @@ def readconfig():
             if k != 'DEFAULT':
                 print k
                 print config[k]
+                domain[k] = []
                 domain[k].append(config[k]['interface'])
                 domain[k].append(config[k]['name'])
     except:
