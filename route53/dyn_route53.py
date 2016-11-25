@@ -23,9 +23,8 @@ def readconfig():
             if k != 'DEFAULT':
                 print k
                 print config[k]
-                domain[k] = []
-                domain[k].append(config[k]['interface'])
-                domain[k].append(config[k]['name'])
+                for i in config[k]:
+                    print config[k][i]
     except:
         print sys.exc_info()[0]
         print "Config Error"
@@ -50,13 +49,18 @@ def get_zone_id(route53, domain):
             return response['HostedZones'][i]['Id']
 
 
-def update_ot(route53, domain, record, ip):
+def update_ot(route53, domain, record, ip, version=4):
     """Update record in route 53 hosted zone."""
+    if version == 4:
+        type == "A"
+    if version == 6:
+        type == "AAAA"
+
     full_record = record + '.' + domain + '.'
     response = route53.change_resource_record_sets(
         HostedZoneId=get_zone_id(route53, domain), ChangeBatch={'Comment': 'Python test dns record', 'Changes': [
             {'Action': 'UPSERT', 'ResourceRecordSet': {
-                'Name': full_record, 'Type': 'A', 'TTL': 300, 'ResourceRecords':
+                'Name': full_record, 'Type': type, 'TTL': 300, 'ResourceRecords':
                 [
                     {'Value': ip},
                 ],
