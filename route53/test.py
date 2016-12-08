@@ -53,7 +53,8 @@ def main():
     route53 = boto3.client('route53',
                            aws_access_key_id=conf['access_key'],
                            aws_secret_access_key=conf['secret'])
-    response = update_ot(route53, 'meodo.com', 'foo', '185.35.77.26')
+
+    response = update_ot(route53, 'opentokix.com', 'usvpn', '52.91.169.54')
     print response
 
 

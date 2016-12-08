@@ -20,7 +20,7 @@ class Graphite(object):
 
 
 def main():
-    graphite = Graphite('127.0.0.1', 2003)
+    graphite = Graphite('104.155.112.150', 2003)
     for i in range(10):
         graphite.send('first.data', random.random()*10)
         print "Sent data iteration %s" % str(i)
