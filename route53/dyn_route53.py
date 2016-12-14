@@ -22,6 +22,7 @@ def readconfig():
     try:
         config.read('/home/peter/credentials/route53_dyn.conf')
         domain = {}
+        print config
         for k in config:
             if k != 'DEFAULT':
                 for i in config[k]:
