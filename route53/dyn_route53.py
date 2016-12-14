@@ -25,6 +25,7 @@ def readconfig():
         for k in config:
             if k != 'DEFAULT':
                 for i in config[k]:
+                    domain[k] = config[k][i]
                     print config[k][i]
     except:
         print sys.exc_info()[0]
