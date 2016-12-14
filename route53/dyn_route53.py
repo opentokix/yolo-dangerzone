@@ -24,8 +24,6 @@ def readconfig():
         domain = {}
         for k in config:
             if k != 'DEFAULT':
-                print k
-                print config[k]
                 for i in config[k]:
                     print config[k][i]
     except:
