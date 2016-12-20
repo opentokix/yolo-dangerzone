@@ -8,15 +8,27 @@ from netifaces import AF_INET, AF_INET6, AF_LINK, AF_PACKET, AF_BRIDGE
 import netifaces as ni
 
 
+def usage():
+    """Automatic update script for route53."""
+    exit_message(usage.__doc__, 0)
+
+
+def exit_message(message, code):
+    """Exit program with message and code."""
+    print message
+    sys.exit(code)
+
+
 def readconfig():
     """Read credentials and other optional config options."""
     conf = {'access_key': 'undefined', 'secret': 'undefined'}
     cred = configparser.ConfigParser()
+
     try:
         cred.read('/home/peter/credentials/route53.cred')
     except e:
-        print e
-        sys.exit(1)
+        exit_message(e, 1)
+
     if 'ROUTE53' in cred:
         conf['access_key'] = cred['ROUTE53']['access_key']
         conf['secret'] = cred['ROUTE53']['secret_access_key']
@@ -69,7 +81,27 @@ def update_ot(route53, domain, record, ip, version=4):
     return response
 
 
-def main():
+def parse_options(argv):
+    """Parse options."""
+    try:
+        opts, args = getopt.getopt(argv, 'hV:d:i:', ['help', 'version=', 'domain=', 'interface='])
+    except getopt.GetoptError:
+        print "Options error"
+        sys.exit(1)
+    options = {}
+    for opt, arg in opts:
+        if opt in ['-h', '--help']:
+            usage()
+        elif opt in ['-V', '--version']:
+            options['version'] = arg
+        elif opt in ['-d', '--domain']:
+            options['domain'] = arg
+        elif opt in ['-i', '--interface']:
+            options['interface'] = arg
+    main(options)
+
+
+def main(options):
     """Main function."""
     conf = readconfig()
     """
@@ -78,8 +110,8 @@ def main():
                            #aws_secret_access_key=conf['secret'])
     #response = update_ot(route53, 'meodo.com', 'foo', '185.35.77.26')
     """
-    print conf
+
 
 
 if __name__ == '__main__':
-    main()
+    parse_options(sys.argv[1:])
