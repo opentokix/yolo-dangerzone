@@ -11,29 +11,16 @@ import netifaces as ni
 def readconfig():
     """Read credentials and other optional config options."""
     conf = {'access_key': 'undefined', 'secret': 'undefined'}
-
     cred = configparser.ConfigParser()
-    config = configparser.ConfigParser()
-
-    cred.read('/home/peter/credentials/route53.cred')
+    try:
+        cred.read('/home/peter/credentials/route53.cred')
+    except e:
+        print e
+        sys.exit(1)
     if 'ROUTE53' in cred:
         conf['access_key'] = cred['ROUTE53']['access_key']
         conf['secret'] = cred['ROUTE53']['secret_access_key']
-    try:
-        config.read('/home/peter/credentials/route53_dyn.conf')
-        domain = {}
-        print config[extbr]
-        for k in config:
-            if k != 'DEFAULT':
-                for i in config[k]:
-                    domain[k] = config[k][i]
-                    print config[k][i]
-    except:
-        print sys.exc_info()[0]
-        print "Config Error"
-        sys.exit(3)
-
-    return conf, domain
+    return conf
 
 
 def get_if_addr(interface="eth0", version="ipv4"):
@@ -84,14 +71,14 @@ def update_ot(route53, domain, record, ip, version=4):
 
 def main():
     """Main function."""
-    conf, domains = readconfig()
+    conf = readconfig()
     """
     #route53 = boto3.client('route53',
                            #aws_access_key_id=conf['access_key'],
                            #aws_secret_access_key=conf['secret'])
     #response = update_ot(route53, 'meodo.com', 'foo', '185.35.77.26')
     """
-    print conf, domains
+    print conf
 
 
 if __name__ == '__main__':
