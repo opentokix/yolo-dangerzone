@@ -19,7 +19,7 @@ def exit_message(message, code):
     sys.exit(code)
 
 
-def readconfig():
+def readcredentials():
     """Read credentials and other optional config options."""
     conf = {'access_key': 'undefined', 'secret': 'undefined'}
     cred = configparser.ConfigParser()
@@ -32,8 +32,9 @@ def readconfig():
     if 'ROUTE53' in cred:
         conf['access_key'] = cred['ROUTE53']['access_key']
         conf['secret'] = cred['ROUTE53']['secret_access_key']
-    return conf
+    return credentials
 
+def resolve_domain(domainname, resolver):
 
 def get_if_addr(interface="eth0", version="ipv4"):
     """Returning the address of the interface, defaults to ipv4."""
@@ -103,7 +104,7 @@ def parse_options(argv):
 
 def main(options):
     """Main function."""
-    conf = readconfig()
+    credentials = readcredentials()
     """
     #route53 = boto3.client('route53',
                            #aws_access_key_id=conf['access_key'],
