@@ -83,8 +83,6 @@ def update_route53(route53, domain, record, ip, version='ipv4'):
         type = "AAAA"
 
     full_record = record + '.' + domain + '.'
-    print type
-    print full_record
     response = route53.change_resource_record_sets(
         HostedZoneId=get_zone_id(route53, domain), ChangeBatch={'Comment': 'Autoupdated record', 'Changes': [
             {'Action': 'UPSERT', 'ResourceRecordSet': {
@@ -133,11 +131,11 @@ def main(options):
     """Main function."""
     credentials = readcredentials(options['awskeys'])
     local_ip = get_if_addr(options['interface'], options['version'])
-    resolved = resolve_domain(options['domain'])
+    resolved = resolve_domain(options['hostname'] + "." + options['domain'])
+
     if resolved is not False:
-        resolved_ip = resolved
-    if resolved_ip == local_ip:
-        sys.exit(0)
+        if resolved == local_ip:
+            sys.exit(0)
     else:
         route53 = boto3.client('route53',
                                aws_access_key_id=credentials['access_key'],
