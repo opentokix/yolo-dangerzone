@@ -46,7 +46,7 @@ def resolve_domain(domainname):
         for rdata in dns.resolver.query(domainname):
             answers.append(rdata)
     if len(list(set(answers))) == 1:
-        return answers[0]
+        return str(answers[0])
     else:
         return False
 
@@ -54,9 +54,9 @@ def resolve_domain(domainname):
 def get_if_addr(interface="eth0", version="ipv4"):
     """Returning the address of the interface, defaults to ipv4."""
     if version == 'ipv6':
-        return ni.ifaddresses(interface)[AF_INET6][0]['addr']
+        return str(ni.ifaddresses(interface)[AF_INET6][0]['addr'])
     else:
-        return ni.ifaddresses(interface)[AF_INET][0]['addr']
+        return str(ni.ifaddresses(interface)[AF_INET][0]['addr'])
 
 
 def get_available_zones(route53):
@@ -132,9 +132,8 @@ def main(options):
     credentials = readcredentials(options['awskeys'])
     local_ip = get_if_addr(options['interface'], options['version'])
     resolved = resolve_domain(options['hostname'] + "." + options['domain'])
-
     if resolved == local_ip:
-        print "local"
+        print "No action needed local ip and resolved ip match, %s.%s points to %s" % (options['hostname'], options['domain'], local_ip)
         sys.exit(0)
 
     else:
