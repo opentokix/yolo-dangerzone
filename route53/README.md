@@ -22,6 +22,7 @@ This will update dynamic.opentokix.com with ip from the interface extbr
 
 Dual stack support, but has to be run twice to take both ipv4 and ipv6 from a single interface. 
 
+
 <pre>
 ./dyn_route53.py --interface=extbr --domain=opentokix.com --hostname=dynamic --awskeys="/root/aws.cred" --ipv4
 </pre>

@@ -37,13 +37,16 @@ def readcredentials(credentials='/home/peter/credentials/route53.cred'):
     return conf
 
 
-def resolve_domain(domainname):
+def resolve_domain(domainname, version):
     """Check if the domain resolves correctly with google and opendns."""
     queryservers = ['8.8.8.8', '8.8.4.4', '208.67.222.222', '208.67.220.220']
     answers = []
-
+    if version == 'ipv6':
+        query_type = 'AAAA'
+    else:
+        query_type = 'A'
     for rdns in queryservers:
-        for rdata in dns.resolver.query(domainname):
+        for rdata in dns.resolver.query(domainname, query_type):
             answers.append(rdata)
     if len(list(set(answers))) == 1:
         return str(answers[0])
@@ -131,7 +134,7 @@ def main(options):
     """Main function."""
     credentials = readcredentials(options['awskeys'])
     local_ip = get_if_addr(options['interface'], options['version'])
-    resolved = resolve_domain(options['hostname'] + "." + options['domain'])
+    resolved = resolve_domain(options['hostname'] + "." + options['domain'], options['version'])
     if resolved == local_ip:
         print "No action needed local ip and resolved ip match, %s.%s points to %s" % (options['hostname'], options['domain'], local_ip)
         sys.exit(0)
