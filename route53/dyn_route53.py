@@ -133,9 +133,10 @@ def main(options):
     local_ip = get_if_addr(options['interface'], options['version'])
     resolved = resolve_domain(options['hostname'] + "." + options['domain'])
 
-    if resolved is not False:
-        if resolved == local_ip:
-            sys.exit(0)
+    if resolved == local_ip:
+        print "local"
+        sys.exit(0)
+
     else:
         route53 = boto3.client('route53',
                                aws_access_key_id=credentials['access_key'],
