@@ -2,10 +2,12 @@
 """Tool to handle route53 hosted domains."""
 import configparser
 import boto3
-from subprocess import check_output
 import sys
-from netifaces import AF_INET, AF_INET6, AF_LINK, AF_PACKET, AF_BRIDGE
+from netifaces import AF_INET, AF_INET6
+# AF_LINK, AF_PACKET, AF_BRIDGE
 import netifaces as ni
+import dns.resolver
+import getopt
 
 
 def usage():
@@ -19,38 +21,45 @@ def exit_message(message, code):
     sys.exit(code)
 
 
-<<<<<<< HEAD
-def readconfig():
-=======
-def readcredentials():
->>>>>>> fe9a7194e94fd93510be54909b0a0484a923d9df
+def readcredentials(credentials='/home/peter/credentials/route53.cred'):
     """Read credentials and other optional config options."""
     conf = {'access_key': 'undefined', 'secret': 'undefined'}
     cred = configparser.ConfigParser()
 
     try:
         cred.read('/home/peter/credentials/route53.cred')
-    except e:
+    except Exception as e:
         exit_message(e, 1)
 
     if 'ROUTE53' in cred:
         conf['access_key'] = cred['ROUTE53']['access_key']
         conf['secret'] = cred['ROUTE53']['secret_access_key']
-<<<<<<< HEAD
     return conf
-=======
-    return credentials
->>>>>>> fe9a7194e94fd93510be54909b0a0484a923d9df
 
-def resolve_domain(domainname, resolver):
+
+def resolve_domain(domainname, version):
+    """Check if the domain resolves correctly with google and opendns."""
+    queryservers = ['8.8.8.8', '8.8.4.4', '208.67.222.222', '208.67.220.220']
+    answers = []
+    if version == 'ipv6':
+        query_type = 'AAAA'
+    else:
+        query_type = 'A'
+    for rdns in queryservers:
+        for rdata in dns.resolver.query(domainname, query_type):
+            answers.append(rdata)
+    if len(list(set(answers))) == 1:
+        return str(answers[0])
+    else:
+        return False
+
 
 def get_if_addr(interface="eth0", version="ipv4"):
     """Returning the address of the interface, defaults to ipv4."""
     if version == 'ipv6':
-        v = "AF_INET6"
+        return str(ni.ifaddresses(interface)[AF_INET6][0]['addr'])
     else:
-        v = "AF_INET"
-    return ni.ifaddresses(interface)[v][0]['addr']
+        return str(ni.ifaddresses(interface)[AF_INET][0]['addr'])
 
 
 def get_available_zones(route53):
@@ -69,12 +78,12 @@ def get_zone_id(route53, domain):
             return response['HostedZones'][i]['Id']
 
 
-def update_ot(route53, domain, record, ip, version=4):
+def update_route53(route53, domain, record, ip, version='ipv4'):
     """Update record in route 53 hosted zone."""
-    if version == 4:
-        type == "A"
-    if version == 6:
-        type == "AAAA"
+    if version == 'ipv4':
+        type = "A"
+    else:
+        type = "AAAA"
 
     full_record = record + '.' + domain + '.'
     response = route53.change_resource_record_sets(
@@ -93,37 +102,49 @@ def update_ot(route53, domain, record, ip, version=4):
 def parse_options(argv):
     """Parse options."""
     try:
-        opts, args = getopt.getopt(argv, 'hV:d:i:', ['help', 'version=', 'domain=', 'interface='])
+        opts, args = getopt.getopt(argv, 'h46:d:H:i:A:', ['help', 'ipv4', 'ipv6', 'domain=', 'hostname=', 'interface=', 'awskeys='])
     except getopt.GetoptError:
         print "Options error"
         sys.exit(1)
     options = {}
+    options['version'] = 'ipv4'
+    options['domain'] = 'opentokix.com'
+    options['hostname'] = 'dynamic'
+    options['interface'] = 'eth0'
+
     for opt, arg in opts:
         if opt in ['-h', '--help']:
             usage()
-        elif opt in ['-V', '--version']:
-            options['version'] = arg
+        elif opt in ['-4', '--ipv4']:
+            options['version'] = 'ipv4'
+        elif opt in ['-6', '--ipv6']:
+            options['version'] = 'ipv6'
         elif opt in ['-d', '--domain']:
             options['domain'] = arg
+        elif opt in ['-H', '--hostname']:
+            options['hostname'] = arg
         elif opt in ['-i', '--interface']:
             options['interface'] = arg
+        elif opt in ['-A', '--awskeys']:
+            options['awskeys'] = arg
     main(options)
 
 
 def main(options):
     """Main function."""
-<<<<<<< HEAD
-    conf = readconfig()
-=======
-    credentials = readcredentials()
->>>>>>> fe9a7194e94fd93510be54909b0a0484a923d9df
-    """
-    #route53 = boto3.client('route53',
-                           #aws_access_key_id=conf['access_key'],
-                           #aws_secret_access_key=conf['secret'])
-    #response = update_ot(route53, 'meodo.com', 'foo', '185.35.77.26')
-    """
+    credentials = readcredentials(options['awskeys'])
+    local_ip = get_if_addr(options['interface'], options['version'])
+    resolved = resolve_domain(options['hostname'] + "." + options['domain'], options['version'])
+    if resolved == local_ip:
+        print "No action needed local ip and resolved ip match, %s.%s points to %s" % (options['hostname'], options['domain'], local_ip)
+        sys.exit(0)
 
+    else:
+        route53 = boto3.client('route53',
+                               aws_access_key_id=credentials['access_key'],
+                               aws_secret_access_key=credentials['secret'])
+        response = update_route53(route53, options['domain'], options['hostname'], local_ip, options['version'])
+        print response
 
 
 if __name__ == '__main__':
