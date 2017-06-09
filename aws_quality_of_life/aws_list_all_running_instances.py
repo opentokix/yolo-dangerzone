@@ -10,9 +10,10 @@ def main():
     regions = []
     metadata = boto3.client('ec2')
     response = metadata.describe_regions()
-    for r in response['Regions']:
-        regions.append(r['RegionName'])
-    #regions = ['eu-central-1', 'eu-west-2']
+
+    for region in response['Regions']:
+        regions.append(region['RegionName'])
+
     for region in regions:
         ec2 = boto3.client('ec2', region)
         response = ec2.describe_instances()
