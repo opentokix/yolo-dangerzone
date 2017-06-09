@@ -16,9 +16,9 @@ def main():
     for region in regions:
         ec2 = boto3.client('ec2', region)
         response = ec2.describe_instances()
-        print(region)
 
         for reservation in response["Reservations"]:
+            print(region)
             for instance in reservation["Instances"]:
                 id = (instance["InstanceId"])
                 state = ec2.describe_instance_status(InstanceIds=[id])
