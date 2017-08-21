@@ -6,6 +6,8 @@ Packages:
 apt install python-configparser python-pip
 pip install boto3
 pip install dsnpython
+
+
 """
 import configparser
 import boto3
@@ -19,7 +21,39 @@ import csv
 
 
 def usage():
-    """Automatic update script for route53."""
+    """Automatic update script for route53.
+
+    Options:
+        -h --help This text
+        -4 --ipv4 Update an A record
+        -6 --ipv6 Update an AAAA record
+        -d --domain domain name to use (Has to be a zone hosted by you)
+        -H --hostname the hostname (Can be a host.subdomain)
+        -i --ip the ip-address that will be associated with h.d.tld
+        -A --awskeys path to credentials file in ini-format.
+        -c --csv path to csv file of hostname, ip and version
+
+    invoke with:
+    ./ip_update_route53.py --domain=domain.tld \
+--awskeys=/path/to/aws-credentials.ini  \
+--csv=/home/peter/tmp/list.lst
+    or:
+    ./ip_update_route53.py --domain=domain.tld \
+--awskeys=/path/to/aws-credentials.ini \
+--ip=1.2.3.4 --hostname=single-ip --ipv4
+
+    if cvs is provided, ip and hostname on commandline will be ignored.
+
+    Example of csv-file:
+        hostname.subdomain,1.2.3.4,ipv4
+        hostname.subdomin,2001:2342:abdc::1,ipv6
+        hostname,1.2.3.5,ipv4
+
+    Example of ini-file for credentials:
+        [ROUTE53]
+        access_key = <ACCESSKEY>
+        secret_access_key = <SECRETACCESSKEY>
+    """
     exit_message(usage.__doc__, 0)
 
 
