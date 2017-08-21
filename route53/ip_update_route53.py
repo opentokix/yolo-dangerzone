@@ -1,11 +1,18 @@
 #!/usr/bin/env python2
-"""Tool to handle route53 hosted domains."""
+"""Tool to handle route53 hosted domains.
+
+Packages:
+
+apt install python-configparser python-pip
+pip install boto3
+pip install dsnpython
+"""
 import configparser
 import boto3
 import sys
-from netifaces import AF_INET, AF_INET6
+#from netifaces import AF_INET, AF_INET6
 # AF_LINK, AF_PACKET, AF_BRIDGE
-import netifaces as ni
+#import netifaces as ni
 import dns.resolver
 import getopt
 
@@ -54,14 +61,6 @@ def resolve_domain(domainname, version):
         return False
 
 
-def get_if_addr(interface="eth0", version="ipv4"):
-    """Returning the address of the interface, defaults to ipv4."""
-    if version == 'ipv6':
-        return str(ni.ifaddresses(interface)[AF_INET6][0]['addr'])
-    else:
-        return str(ni.ifaddresses(interface)[AF_INET][0]['addr'])
-
-
 def get_available_zones(route53):
     """Get zones handled by this account, for some basic checks."""
     response = route53.list_hosted_zones()
@@ -102,7 +101,7 @@ def update_route53(route53, domain, record, ip, version='ipv4'):
 def parse_options(argv):
     """Parse options."""
     try:
-        opts, args = getopt.getopt(argv, 'h46:d:H:i:A:', ['help', 'ipv4', 'ipv6', 'domain=', 'hostname=', 'interface=', 'awskeys='])
+        opts, args = getopt.getopt(argv, 'h46:d:H:i:A:', ['help', 'ipv4', 'ipv6', 'domain=', 'hostname=', 'ip=', 'awskeys='])
     except getopt.GetoptError:
         print "Options error"
         sys.exit(1)
@@ -110,7 +109,7 @@ def parse_options(argv):
     options['version'] = 'ipv4'
     options['domain'] = 'opentokix.com'
     options['hostname'] = 'dynamic'
-    options['interface'] = 'eth0'
+    options['ip'] = '127.0.0.1'
 
     for opt, arg in opts:
         if opt in ['-h', '--help']:
@@ -123,8 +122,8 @@ def parse_options(argv):
             options['domain'] = arg
         elif opt in ['-H', '--hostname']:
             options['hostname'] = arg
-        elif opt in ['-i', '--interface']:
-            options['interface'] = arg
+        elif opt in ['-i', '--ip']:
+            options['ip'] = arg
         elif opt in ['-A', '--awskeys']:
             options['awskeys'] = arg
     main(options)
@@ -133,7 +132,7 @@ def parse_options(argv):
 def main(options):
     """Main function."""
     credentials = readcredentials(options['awskeys'])
-    local_ip = get_if_addr(options['interface'], options['version'])
+    local_ip = options['ip']
     resolved = resolve_domain(options['hostname'] + "." + options['domain'], options['version'])
     if resolved == local_ip:
         print "No action needed local ip and resolved ip match, %s.%s points to %s" % (options['hostname'], options['domain'], local_ip)
