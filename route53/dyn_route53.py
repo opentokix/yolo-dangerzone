@@ -134,7 +134,8 @@ def main(options):
     """Main function."""
     credentials = readcredentials(options['awskeys'])
     local_ip = get_if_addr(options['interface'], options['version'])
-    resolved = resolve_domain(options['hostname'] + "." + options['domain'], options['version'])
+    try:
+        resolved = resolve_domain(options['hostname'] + "." + options['domain'], options['version'])
     if resolved == local_ip:
         print "No action needed local ip and resolved ip match, %s.%s points to %s" % (options['hostname'], options['domain'], local_ip)
         sys.exit(0)

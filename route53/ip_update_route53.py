@@ -15,6 +15,7 @@ import sys
 #import netifaces as ni
 import dns.resolver
 import getopt
+import csv
 
 
 def usage():
@@ -101,7 +102,7 @@ def update_route53(route53, domain, record, ip, version='ipv4'):
 def parse_options(argv):
     """Parse options."""
     try:
-        opts, args = getopt.getopt(argv, 'h46:d:H:i:A:', ['help', 'ipv4', 'ipv6', 'domain=', 'hostname=', 'ip=', 'awskeys='])
+        opts, args = getopt.getopt(argv, 'h46:d:H:i:A:c:', ['help', 'ipv4', 'ipv6', 'domain=', 'hostname=', 'ip=', 'awskeys=', 'csv='])
     except getopt.GetoptError:
         print "Options error"
         sys.exit(1)
@@ -126,25 +127,52 @@ def parse_options(argv):
             options['ip'] = arg
         elif opt in ['-A', '--awskeys']:
             options['awskeys'] = arg
+        elif opt in ['-c', '--csv']:
+            options['csv'] = arg
     main(options)
 
+def update_recordset(credentials, options, local_ip):
+    route53 = boto3.client('route53',
+                           aws_access_key_id=credentials['access_key'],
+                           aws_secret_access_key=credentials['secret'])
+    response = update_route53(route53, options['domain'], options['hostname'], local_ip, options['version'])
+    print response
+
+def construct_csv(options):
+    ip_list = []
+    if 'csv' in options:
+        with open(options['csv'], "r") as csvfile:
+            r = csv.reader(csvfile, delimiter=',')
+            for row in r:
+                if len(row) != 0:
+                    ip_list.append(row)
+    else:
+        item = [options['hostname'], options['ip'], options['version']]
+        ip_list.append(item)
+    return ip_list
+
+def intelligent_update(credentials, hostdata, options):
+    try:
+        resolved = resolve_domain(hostdata[0] + "." + options['domain'], hostdata[2])
+    except dns.resolver.NoAnswer:
+        resolved = False
+    if resolved == hostdata[1]:
+        print "No action needed local ip and resolved ip match, %s.%s points to %s" % (hostdata[0], options['domain'], hostdata[1])
+        return
+    else:
+        options['hostname'] = hostdata[0]
+        options['version'] = hostdata[2]
+        update_recordset(credentials, options, hostdata[1])
 
 def main(options):
     """Main function."""
     credentials = readcredentials(options['awskeys'])
     local_ip = options['ip']
-    resolved = resolve_domain(options['hostname'] + "." + options['domain'], options['version'])
-    if resolved == local_ip:
-        print "No action needed local ip and resolved ip match, %s.%s points to %s" % (options['hostname'], options['domain'], local_ip)
-        sys.exit(0)
 
-    else:
-        route53 = boto3.client('route53',
-                               aws_access_key_id=credentials['access_key'],
-                               aws_secret_access_key=credentials['secret'])
-        response = update_route53(route53, options['domain'], options['hostname'], local_ip, options['version'])
-        print response
 
+    group = construct_csv(options)
+    for i in range(0,len(group)):
+        intelligent_update(credentials, group[i], options)
 
 if __name__ == '__main__':
     parse_options(sys.argv[1:])
