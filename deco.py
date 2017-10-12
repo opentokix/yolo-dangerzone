@@ -6,13 +6,14 @@ global DEBUG
 DEBUG = True
 
 def verbose(func):
+    start_time = time.clock()
     wraps(func)
     def wrapper(*args, **kwargs):
-        start_time = time.time()
         res = func(*args, **kwargs)
-        t = (time.time() - start_time)
         if DEBUG  == True:
-            print "%s took %fs" % (func.__name__, t)
+            end_time = time.clock()
+            t = end_time - start_time
+            print "%s was done after: %fs" % (func.__name__, t)
         return res
     return wrapper
 
