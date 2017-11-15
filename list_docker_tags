@@ -1,0 +1,13 @@
+#!/bin/bash
+if [ $# -eq 0 ]
+then
+  echo "Usage: $0 imagename"
+  echo "To list all tags of a docker image from docker hub"
+  exit 1
+fi
+base_url='https://registry.hub.docker.com/v2/repositories/library/'
+image=$1
+post_url='/tags?page_size=1024'
+url=${base_url}${image}${post_url}
+
+curl -L -s ${url}|jq '."results"[]["name"]'
