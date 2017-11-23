@@ -7,7 +7,7 @@ def main():
     """Only one dirty main."""
     print("Listing all instances running or not in all regions")
     print("Region:")
-    regions = []
+    regions = ['eu-west-1']
     metadata = boto3.client('ec2')
     response = metadata.describe_regions()
 
