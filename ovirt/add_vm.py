@@ -95,9 +95,9 @@ def main(opts):
     options['os_type'] = opts.vm_dist
     config = ConfigParser.ConfigParser()
     config.read(options['credentials'])
-    options['username'] = config.get('main', 'user')
-    options['password'] = config.get('main', 'pass')
-    options['url'] = config.get('main', 'url')
+    options['username'] = config.get('ovirt', 'user')
+    options['password'] = config.get('ovirt', 'pass')
+    options['url'] = config.get('ovirt', 'url')
     url = options['url']
     user = options['username']
     password = options['password']
