@@ -10,6 +10,7 @@ from optparse import OptionParser
 import os
 import sys
 import uuid
+import getpass
 
 
 def construct_credentials(opts):
@@ -154,7 +155,6 @@ def add_nic_to_vm(api, options):
         print "Can't add NIC: %s" % str(e)
         api.close()
         sys.exit(1)
-
 
 
 def main(opts):
