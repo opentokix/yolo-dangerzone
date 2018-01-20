@@ -176,7 +176,7 @@ def main(opts):
                              options['password'],
                              insecure=True)
     except Exception as e:
-        Print "Can't make API Connection: %s" % str(e)
+        print "Can't make API Connection: %s" % str(e)
         sys.exit(1)
 
     add_vm(api, options)
