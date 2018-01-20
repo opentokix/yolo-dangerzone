@@ -68,19 +68,24 @@ def construct_credentials(opts):
 def add_vm(api, options):
     """Adding a VM."""
     vms_service = api.system_service().vms_service()
-    vms_service.add(
-        types.Vm(
-            name=options['vm_name'],
-            memory=options['vmem'],
-            cpu=types.Cpu(topology=options['vcpus']),
-            type=types.VmType('server'),
-            os=types.OperatingSystem(type=options['os_type']),
-            cluster=types.Cluster(
-                name=options['vm_dc'],
+    try:
+        vms_service.add(
+            types.Vm(
+                name=options['vm_name'],
+                memory=options['vmem'],
+                cpu=types.Cpu(topology=options['vcpus']),
+                type=types.VmType('server'),
+                os=types.OperatingSystem(type=options['os_type']),
+                cluster=types.Cluster(
+                    name=options['vm_dc'],
+                ),
+                template=types.Template(name='Blank',),
             ),
-            template=types.Template(name='Blank',),
-        ),
-    )
+        )
+    except Exception as e:
+        print "Can't add VM: %s" % str(e)
+        api.close()
+        sys.exit(1)
 
 
 def add_disk_to_vm(api, options):
@@ -89,24 +94,30 @@ def add_disk_to_vm(api, options):
     vms_service = api.system_service().vms_service()
     vm = vms_service.list(search=search_name)[0]
     disk_attachments_service = vms_service.vm_service(vm.id).disk_attachments_service()
-    disk_attachment = disk_attachments_service.add(
-        types.DiskAttachment(
-            disk=types.Disk(
-                name='os_disk',
-                description='OS',
-                format=types.DiskFormat.COW,
-                provisioned_size=10 * 2**30,
-                storage_domains=[
-                    types.StorageDomain(
-                        name='hypercube1',
-                    ),
-                ],
+    try:
+        disk_attachment = disk_attachments_service.add(
+            types.DiskAttachment(
+                disk=types.Disk(
+                    name='os_disk',
+                    description='OS',
+                    format=types.DiskFormat.COW,
+                    provisioned_size=10 * 2**30,
+                    storage_domains=[
+                        types.StorageDomain(
+                            name='hypercube1',
+                        ),
+                    ],
+                ),
+                interface=types.DiskInterface.VIRTIO,
+                bootable=True,
+                active=True,
             ),
-            interface=types.DiskInterface.VIRTIO,
-            bootable=True,
-            active=True,
-        ),
-    )
+        )
+    except Exception as e:
+        print "Can't add Disk: %s" % str(e)
+        api.close()
+        sys.exit(1)
+
     disks_service = api.system_service().disks_service()
     disk_service = disks_service.disk_service(disk_attachment.disk.id)
     while True:
@@ -129,15 +140,21 @@ def add_nic_to_vm(api, options):
             profile_id = profile.id
             break
     nics_service = vms_service.vm_service(vm.id).nics_service()
-    nics_service.add(
-        types.Nic(
-            name='nic1',
-            description='My network interface card',
-            vnic_profile=types.VnicProfile(
-                id=profile_id,
+    try:
+        nics_service.add(
+            types.Nic(
+                name='nic1',
+                description='My network interface card',
+                vnic_profile=types.VnicProfile(
+                    id=profile_id,
+                ),
             ),
-        ),
-    )
+        )
+    except Exception as e:
+        print "Can't add NIC: %s" % str(e)
+        api.close()
+        sys.exit(1)
+
 
 
 def main(opts):
@@ -153,10 +170,15 @@ def main(opts):
     options['os_type'] = opts.vm_dist
     options['vcpus'] = types.CpuTopology(cores=options['num_cpus'], sockets=1)
     options['vmem'] = int(options['ram_amount']) * 2**30
-    api = sdk.Connection(options['url'],
-                         options['username'],
-                         options['password'],
-                         insecure=True)
+    try:
+        api = sdk.Connection(options['url'],
+                             options['username'],
+                             options['password'],
+                             insecure=True)
+    except Exception as e:
+        Print "Can't make API Connection: %s" % str(e)
+        sys.exit(1)
+
     add_vm(api, options)
     add_nic_to_vm(api, options)
     add_disk_to_vm(api, options)

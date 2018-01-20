@@ -13,7 +13,11 @@ import getpass
 def lists_vms(api, options):
     """List all vms."""
     vms_service = api.system_service().vms_service()
-    vms = vms_service.list()
+    try:
+        vms = vms_service.list()
+    except Exception as e:
+        print e
+        sys.exit(1)
     for vm in vms:
         print("%s: %s" % (vm.name, vm.id))
 
@@ -79,8 +83,8 @@ def main(opts):
     password = options['password']
     try:
         api = sdk.Connection(url, user, password, insecure=True)
-    except sdk.AuthError:
-        print "Authentication error"
+    except Exception as e:
+        print str(e)
         sys.exit(1)
     except:
         print "Unknown connection error"
