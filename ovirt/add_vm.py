@@ -1,5 +1,20 @@
 #!/usr/bin/env python
-"""Create VM in ovirt."""
+"""Create VM in ovirt.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+"""
 
 
 import ovirtsdk4 as sdk
@@ -11,6 +26,40 @@ import os
 import sys
 import uuid
 import getpass
+
+
+def usage():
+    """Tool will add a VM to ovirt or rhev 4.x using the API.
+
+    Options:
+        -u, --user: ovirt username
+        -U, --url: url of the ovirt manager (https://hostname.domain.tld/ovirt-engine/api)
+        -p, --password: your password
+        -n, --name: name of the vm you want to create (defaults to uuid)
+        -c, --cpus: Number of cpu cores (default: 1)
+        -r, --ram: Amount of ram in GB (default: 2 GB)
+        -o, --osdisk: Size of OS disk in GB (default: 30 GB)
+        -d, --datacenter: Name of datacenter (default: Hypercube1)
+        -z, --credentials: Location and name of credentials ini-file.
+        -s, --system: Operating system (default: rhel_7x64)
+        -h, --help: This help text
+
+    Credentials can be provided in various ways:
+        Command line with -u, -p
+        Environment variables: ovirt_user, ovirt_password, ovirt_url
+        INI file as described below
+        And if none of the above, interactive prompt for hostname + password.
+
+    Example credentials ini:
+        [ovirt]
+        url=https://hostname.domain.tld/ovirt-engine/api
+        user=admin@internal
+        pass=abc123
+
+    Tested on ovirt 4.2.0.2-1.el7.centos
+    """
+    print usage.__doc__
+    sys.exit(0)
 
 
 def construct_credentials(opts):
@@ -57,6 +106,7 @@ def construct_credentials(opts):
     for key in raw_credentials:
         if len(raw_credentials[key]) == 0:
             if key == "username":
+                # this will never trigger, here for future use maybe
                 raw_credentials['username'] = raw_input("Username: ")
             if key == "password":
                 raw_credentials['password'] = getpass.getpass()
@@ -159,6 +209,8 @@ def add_nic_to_vm(api, options):
 
 def main(opts):
     """Magic main."""
+    if opts.usage:
+        usage()
     options = construct_credentials(opts)
     options['num_cpus'] = int(opts.num_cpus)
     options['ram_amount'] = int(opts.ram_amount)
@@ -187,15 +239,16 @@ def main(opts):
 
 if __name__ == '__main__':
     p = OptionParser()
-    p.add_option("-u", "--user", dest="username", help="Username for ovirtmanager", metavar="user@domain", default="admin@internal")
-    p.add_option("-U", "--url", dest="url", help="Url of the ovirt api: https://ovirtmanager.example.com/ovirt-engine/api", metavar="STRING")
+    p.add_option("-u", "--user", dest="username", help="Username for ovirtmanager", default="admin@internal")
+    p.add_option("-U", "--url", dest="url", help="Url of the ovirt api: https://ovirtmanager.example.com/ovirt-engine/api",)
     p.add_option("-p", "--password", dest="password", help="Password for ovirtmanager")
     p.add_option("-n", "--name", dest="vm_name", help="Name of VM")
-    p.add_option("-c", "--cpus", dest="num_cpus", help="number of cpus", metavar="INT", default=1)
-    p.add_option("-r", "--ram", dest="ram_amount", help="Amount of ram in GB", metavar="INT", default=2)
-    p.add_option("-o", "--osdisk", dest="osdisk", help="Amount of disk in GB", metavar="INT", default=30)
-    p.add_option("-d", "--datacenter", dest="vm_dc", help="Target datacenter", metavar="STRING", default="Hypercube1")
+    p.add_option("-c", "--cpus", dest="num_cpus", help="number of cpus", default=1)
+    p.add_option("-r", "--ram", dest="ram_amount", help="Amount of ram in GB", default=2)
+    p.add_option("-o", "--osdisk", dest="osdisk", help="Amount of disk in GB", default=30)
+    p.add_option("-d", "--datacenter", dest="vm_dc", help="Target datacenter", default="Hypercube1")
     p.add_option("-z", "--credentials", dest="credentials", help="Credentials location")
-    p.add_option("-l", "--linux_dist", dest="vm_dist", help="Linux Dist (rhel_7x64, rhel_6x64, debian7)", metavar="STRING", default='rhel_7x64')
+    p.add_option("-s", "--system", dest="vm_dist", help="Linux Dist (rhel_7x64, rhel_6x64, debian7)", default='rhel_7x64')
+    p.add_option("--usage", action="store_true", dest="usage", help="Show verbose usage instructions")
     (opts, args) = p.parse_args()
     main(opts)
