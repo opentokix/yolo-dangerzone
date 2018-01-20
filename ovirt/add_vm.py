@@ -55,8 +55,13 @@ def construct_credentials(opts):
             pass
     for key in raw_credentials:
         if len(raw_credentials[key]) == 0:
-            print "%s option is missing" % key
-            sys.exit(1)
+            if key == "username":
+                raw_credentials['username'] = raw_input("Username: ")
+            if key == "password":
+                raw_credentials['password'] = getpass.getpass()
+            if key == "url":
+                hostname = raw_input("Hostname of ovirt manager: ")
+                raw_credentials['url'] = "https://%s/ovirt-engine/api" % hostname
     return raw_credentials
 
 
