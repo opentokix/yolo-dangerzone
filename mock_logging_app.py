@@ -6,7 +6,7 @@ import logging.handlers
 import uuid
 from time import sleep
 import random
-from multiprocessing import Process
+import thread
 from optparse import OptionParser
 
 
@@ -17,7 +17,7 @@ def generate_info(logging):
     for line in log_lines:
         log_output = "%s %s\n" % (line, session)
         logging.info(log_output)
-        sleep(0.1)
+        sleep(0.3)
     q = random.randint(45, 99)
     if q > 80:
         log_output = "User quota is %s %s\n" % (str(q), str(session))
@@ -30,7 +30,7 @@ def generate_error(logging):
     for line in log_lines:
         log_output = "%s\n" % (line)
         logging.error(log_output)
-        sleep(0.1)
+        sleep(0.3)
 
 
 def generate_debug(logging):
@@ -39,7 +39,7 @@ def generate_debug(logging):
         time = "%s" % (str(random.randint(123, 900)))
         log_output = "Total processing time %sms\n" % (time)
         logging.debug(log_output)
-        sleep(0.1)
+        sleep(0.3)
 
 
 def main(opts):
@@ -50,16 +50,24 @@ def main(opts):
     formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s: %(message)s')
     sockethandler.setFormatter(formatter)
     rootlogger.addHandler(sockethandler)
+    thread.start_new_thread(generate_info, (logging,))
+    thread.start_new_thread(generate_error, (logging,))
+    thread.start_new_thread(generate_debug, (logging,))
     while True:
-        info_log = Process(target=generate_info(logging))
-        info_log.start()
-        error_log = Process(target=generate_error(logging))
-        error_log.start()
-        debug_log = Process(target=generate_debug(logging))
-        debug_log.start()
-        info_log.join()
-        error_log.join()
-        debug_log.join()
+        thread.start_new_thread(generate_info, (logging,))
+        thread.start_new_thread(generate_error, (logging,))
+        thread.start_new_thread(generate_debug, (logging,))
+        sleep(random.randint(1, 3))
+#    while True:
+#        info_log = Process(target=generate_info(logging))
+#        info_log.start()
+#        error_log = Process(target=generate_error(logging))
+#        error_log.start()
+#        debug_log = Process(target=generate_debug(logging))
+#        debug_log.start()
+#        info_log.join()
+#        error_log.join()
+#        debug_log.join()
     sockethandler.close()
 
 
