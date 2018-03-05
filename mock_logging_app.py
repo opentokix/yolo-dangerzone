@@ -59,16 +59,6 @@ def main(opts):
         thread.start_new_thread(generate_error, (applogging,))
         thread.start_new_thread(generate_debug, (applogging,))
         sleep(random.randint(1, 3))
-#    while True:
-#        info_log = Process(target=generate_info(logging))
-#        info_log.start()
-#        error_log = Process(target=generate_error(logging))
-#        error_log.start()
-#        debug_log = Process(target=generate_debug(logging))
-#        debug_log.start()
-#        info_log.join()
-#        error_log.join()
-#        debug_log.join()
     sockethandler.close()
 
 
