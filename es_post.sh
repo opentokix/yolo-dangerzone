@@ -4,6 +4,8 @@ es_server=localhost
 es_port=9200
 es_type=_doc
 es_index=info
+hostname=`hostname -f|sed 's/\./_/g'`
+tag=$hostname",change"
 
 
 # check for curl and wget
@@ -23,9 +25,6 @@ else
     exit 1
 fi
 
-hostname=`hostname -f|sed 's/\./_/g'`
-tag=$hostname",change"
-username=`whoami`
 
 if [ -z ${@+x} ]
 then
