@@ -12,15 +12,15 @@ def main():
     controller_string += item[0] + ":" + item[1] + ","
   controller_string = "ETCD_INITIAL_CLUSTER=" + controller_string[:-1]
   output = call(['docker', 'run', '--rm', 
-       '-v', '$(pwd):/mnt',
-       '-e', 'OS=rhel',
-       '-e', 'VERSION=1.10.2',
-       '-e', 'CONTAINER_RUNTIME=docker',
-       '-e', 'CNI_PROVIDER=flannel',
-       '-e', controller_string,
-       '-e', 'ETCD_IP=\"%{::ipaddress_eth0}\"',
-       '-e', 'KUBE_API_ADVERTISE_ADDRESS=\"%{::ipaddress_eth0}\"',
-       '-e', 'INSTALL_DASHBOARD=true puppet/kubetool:3.0.1'])
+                 '-v', '$(pwd):/mnt',
+                 '-e', 'OS=rhel',
+                 '-e', 'VERSION=1.10.2',
+                 '-e', 'CONTAINER_RUNTIME=docker',
+                 '-e', 'CNI_PROVIDER=flannel',
+                 '-e', controller_string,
+                 '-e', 'ETCD_IP=\"%{::ipaddress_eth0}\"',
+                 '-e', 'KUBE_API_ADVERTISE_ADDRESS=\"%{::ipaddress_eth0}\"',
+                 '-e', 'INSTALL_DASHBOARD=true puppet/kubetool:3.0.1'])
 
 """
 docker run --rm -v $(pwd):/mnt -e OS=rhel -e VERSION=1.10.2 \
