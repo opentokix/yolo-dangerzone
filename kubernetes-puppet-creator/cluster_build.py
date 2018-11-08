@@ -11,7 +11,7 @@ def main():
   for item in config.items('controllers'):
     controller_string += item[0] + ":" + item[1] + ","
   controller_string = "ETCD_INITIAL_CLUSTER=" + controller_string[:-1]
-  call['docker', 'run', '--rm', 
+  output = call(['docker', 'run', '--rm', 
        '-v', '$(pwd):/mnt',
        '-e', 'OS=rhel',
        '-e', 'VERSION=1.10.2',
