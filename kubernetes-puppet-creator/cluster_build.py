@@ -22,8 +22,6 @@ def main():
                  '-e', 'ETCD_IP="%{::ipaddress_eth0}"',
                  '-e', 'KUBE_API_ADVERTISE_ADDRESS="%{::ipaddress_eth0}"',
                  '-e', 'INSTALL_DASHBOARD=true', 'puppet/kubetool:3.0.1']
-  print command_line
-  #call(['docker', 'run', '--rm', '-e', 'ETCD_IP="%\{::ipaddress_eth0\}"', 'hello-world'])
   call(command_line)
 if __name__ == '__main__':
   main()
