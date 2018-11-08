@@ -21,7 +21,9 @@ def main():
                  '-e', 'ETCD_IP=\"%{::ipaddress_eth0}\"',
                  '-e', 'KUBE_API_ADVERTISE_ADDRESS=\"%{::ipaddress_eth0}\"',
                  '-e', 'INSTALL_DASHBOARD=true puppet/kubetool:3.0.1']
-  output = call(command_line)
+  print command_line
+  call(['docker', 'run', 'hello-world'])
+  #output = call(command_line)
 
 """
 docker run --rm -v $(pwd):/mnt -e OS=rhel -e VERSION=1.10.2 \
