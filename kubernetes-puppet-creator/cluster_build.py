@@ -44,6 +44,7 @@ classes:
 
 def main():
   config = run_docker()
+  make_yaml_files(config)
 
 if __name__ == '__main__':
   main()
