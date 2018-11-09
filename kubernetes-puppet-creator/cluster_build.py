@@ -35,7 +35,7 @@ classes:
   - kubernetes
 """
   for controller in config.items('controllers'):
-    f_name = controller[0] + "." + config.get('main', 'domain')
+    f_name = controller[0] + "." + config.get('main', 'domain') + ".yaml"
     outfile = open(f_name, 'w')
     outfile.writelines(class_block)
     with open('Rhel.yaml') as infile:
@@ -44,7 +44,7 @@ classes:
       outfile.write(infile.read())
 
   for worker in config.items('workers'):
-    f_name = worker[0] + "." + config.get('main', 'domain')
+    f_name = worker[0] + "." + config.get('main', 'domain') + ".yaml"
     outfile = open(f_name, 'w')
     outfile.writelines(class_block)
     with open('Rhel.yaml') as infile:
