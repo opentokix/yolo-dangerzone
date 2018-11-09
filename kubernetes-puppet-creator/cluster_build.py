@@ -3,7 +3,7 @@ import os
 import ConfigParser
 from subprocess import call
 
-def main():
+def run_docker():
   config = ConfigParser.ConfigParser()
   config.readfp(open('cluster_setup.ini'))
   fdqn_base = config.get('main', 'domain')
@@ -12,16 +12,38 @@ def main():
     controller_string += item[0] + ":" + item[1] + ","
   controller_string = "ETCD_INITIAL_CLUSTER=" + controller_string[:-1]
   volume_option = os.getcwd() + ":/mnt"
+  os_option = "OS=" + config['main']['os']
+  version_option = "VERSION=" + config['main']['version']
+  container_runtime_option = "CONTAINER_RUNTIME=" + config['main']['runtime']
+  cni_provider_option = "CNI_PROVIDER=" + config['main']['cniprovider']
   command_line = ['docker', 'run', '--rm',
                  '-v', volume_option,
-                 '-e', 'OS=rhel',
-                 '-e', 'VERSION=1.10.2',
-                 '-e', 'CONTAINER_RUNTIME=docker',
-                 '-e', 'CNI_PROVIDER=flannel',
+                 '-e', os_option,
+                 '-e', version_option,
+                 '-e', container_runtime_option,
+                 '-e', cni_provider_option,
                  '-e', controller_string,
                  '-e', 'ETCD_IP="%{::ipaddress_eth0}"',
                  '-e', 'KUBE_API_ADVERTISE_ADDRESS="%{::ipaddress_eth0}"',
                  '-e', 'INSTALL_DASHBOARD=true', 'puppet/kubetool:3.0.1']
   call(command_line)
+  return config
+
+def make_yaml_files(config):
+  class_block = """
+classes:
+  - kubernetes
+"""
+  for controller in config.items('controllers'):
+    open(controller + "." + config['main']['domain'], 'w') as outfile:
+    outfile.writelines(class_block)
+    with open('Rhel.yaml') as infile:
+      outfile.write(infile.read())
+    with open(controller + ".yaml") as infile:
+      outfile.write(infile.read())
+
+def main():
+  config = run_docker()
+
 if __name__ == '__main__':
   main()
