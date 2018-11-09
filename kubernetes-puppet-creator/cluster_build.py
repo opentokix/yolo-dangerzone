@@ -35,7 +35,7 @@ classes:
   - kubernetes
 """
   for controller in config.items('controllers'):
-    open(controller + "." + config['main']['domain'], 'w') as outfile:
+    open(controller + "." + config['main']['domain'], 'w') as outfile
     outfile.writelines(class_block)
     with open('Rhel.yaml') as infile:
       outfile.write(infile.read())
