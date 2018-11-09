@@ -43,6 +43,13 @@ classes:
     with open(controller[0] + ".yaml") as infile:
       outfile.write(infile.read())
 
+  for worker in config.items('workers'):
+    f_name = worker[0] + "." + config.get('main', 'domain')
+    outfile = open(f_name, 'w')
+    outfile.writelines(class_block)
+    with open('Rhel.yaml') as infile:
+      outfile.write(infile.read())1
+
 def main():
   config = run_docker()
   make_yaml_files(config)
