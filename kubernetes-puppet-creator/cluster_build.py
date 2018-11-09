@@ -40,7 +40,7 @@ classes:
     outfile.writelines(class_block)
     with open('Rhel.yaml') as infile:
       outfile.write(infile.read())
-    with open(controller + ".yaml") as infile:
+    with open(controller[0] + ".yaml") as infile:
       outfile.write(infile.read())
 
 def main():
