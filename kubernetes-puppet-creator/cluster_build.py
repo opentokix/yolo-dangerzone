@@ -12,10 +12,10 @@ def run_docker():
     controller_string += item[0] + ":" + item[1] + ","
   controller_string = "ETCD_INITIAL_CLUSTER=" + controller_string[:-1]
   volume_option = os.getcwd() + ":/mnt"
-  os_option = "OS=" + config['main']['os']
-  version_option = "VERSION=" + config['main']['version']
-  container_runtime_option = "CONTAINER_RUNTIME=" + config['main']['runtime']
-  cni_provider_option = "CNI_PROVIDER=" + config['main']['cniprovider']
+  os_option = "OS=" + config.get('main', 'os')
+  version_option = "VERSION=" + config.get('main', 'version')
+  container_runtime_option = "CONTAINER_RUNTIME=" + config.get('main', 'runtime')
+  cni_provider_option = "CNI_PROVIDER=" + config.get('main', 'cniprovider')
   command_line = ['docker', 'run', '--rm',
                  '-v', volume_option,
                  '-e', os_option,
@@ -35,7 +35,7 @@ classes:
   - kubernetes
 """
   for controller in config.items('controllers'):
-    outfile = open(controller + "." + config['main']['domain'], 'w')
+    outfile = open(controller + "." + config.get('main', 'domain'), 'w')
     outfile.writelines(class_block)
     with open('Rhel.yaml') as infile:
       outfile.write(infile.read())
