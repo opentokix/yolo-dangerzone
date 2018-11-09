@@ -48,7 +48,7 @@ classes:
     outfile = open(f_name, 'w')
     outfile.writelines(class_block)
     with open('Rhel.yaml') as infile:
-      outfile.write(infile.read())1
+      outfile.write(infile.read())
 
 def main():
   config = run_docker()
