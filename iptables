@@ -1,0 +1,141 @@
+#!/bin/bash
+##
+
+## Global Options 
+IPTABLES=/sbin/iptables 
+IP6TABLES=/sbin/ip6tables 
+#EXTERNAL_NET=$IPADDR
+
+## Variables 
+LOOPBACK="127.0.0.0/8"
+CLASS_A="10.0.0.0/8"
+CLASS_B="172.16.0.0/12"
+CLASS_C="192.168.0.0/16"
+CLASS_D_MULTICAST="224.0.0.0/4"
+CLASS_E_RESERVED_NET="240.0.0.0/5"
+# Ports for traceroute 
+TR_SRC_PORTS="32769:65535"
+TR_DEST_PORTS="33434:33523"
+HASHSIZE=25000
+((MAX_CONNECTIONS=2*$HASHSIZE))
+# Firewall begin
+/bin/echo "Starting firewall... "
+
+echo "Kernel Variables incl. ip_forward" 
+/bin/echo 0 > /proc/sys/net/ipv4/ip_forward 
+/bin/echo 1 > /proc/sys/net/ipv4/icmp_echo_ignore_broadcasts
+/bin/echo 0 > /proc/sys/net/ipv4/conf/all/accept_source_route
+/bin/echo 0 > /proc/sys/net/ipv4/conf/all/accept_redirects
+/bin/echo 1 > /proc/sys/net/ipv4/conf/all/log_martians
+
+# Modules
+echo "ip_tables" 
+modprobe ip_tables 
+echo "x_tables" 
+modprobe x_tables 
+modprobe nf_conntrack hashsize=$HASHSIZE
+
+ip_conntrack_max="/proc/sys/net/ipv4/netfilter/ip_conntrack_max"
+if [ ! -f $ip_conntrack_max ]; then
+   ip_conntrack_max="/proc/sys/net/ipv4/ip_conntrack_max"
+fi
+if [ ! -f $ip_conntrack_max ]; then
+   ip_conntrack_max="/proc/sys/net/netfilter/nf_conntrack_max"
+fi 
+/bin/echo $MAX_CONNECTIONS > $ip_conntrack_max
+
+echo "Zeroing Rules"
+# Zeroing rules IPV4
+$IPTABLES -F
+$IPTABLES -t nat -F
+$IPTABLES -t raw -F
+$IPTABLES -X
+$IPTABLES -Z
+$IPTABLES -P INPUT DROP
+$IPTABLES -P FORWARD DROP
+$IPTABLES -P OUTPUT ACCEPT
+
+# Zeroing rules IPV6
+$IP6TABLES -F
+$IP6TABLES -t nat -F
+$IP6TABLES -t raw -F
+$IP6TABLES -X
+$IP6TABLES -Z
+$IP6TABLES -P INPUT DROP
+$IP6TABLES -P FORWARD DROP
+$IP6TABLES -P OUTPUT ACCEPT
+
+# Logging dropped packets 
+$IPTABLES -N LOGDROP 
+$IPTABLES -A LOGDROP -j LOG --log-prefix 'ACTION=iptables_dropped ' --log-level 4
+$IPTABLES -A LOGDROP -j DROP
+
+# Logging dropped packets 
+$IP6TABLES -N LOGDROP 
+$IP6TABLES -A LOGDROP -j LOG --log-prefix 'ACTION=ip6tables_dropped ' --log-level 4
+$IP6TABLES -A LOGDROP -j DROP
+
+#$IPTABLES -A INPUT -i lo -j ACCEPT
+# Drop fragmented packages 
+$IPTABLES -A INPUT -f -j LOGDROP
+
+# ipv4 base rules 
+$IPTABLES -A INPUT -s 127.0.0.0/8 -d 127.0.0.0/8 -j ACCEPT 
+$IPTABLES -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+$IPTABLES -A OUTPUT -p udp -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+$IPTABLES -A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+# IPV6 base rules 
+$IP6TABLES -A INPUT -s ::1 -d ::1 -j ACCEPT 
+$IP6TABLES -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+$IP6TABLES -A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT
+$IP6TABLES -A INPUT -p icmp -j ACCEPT 
+$IP6TABLES -A INPUT -p ipv6-icmp -j ACCEPT
+
+# Logging of all accepted tcp traffic sent to this chain 
+$IPTABLES -N LOGACCEPT
+$IPTABLES -A LOGACCEPT -p tcp -j LOG --log-prefix 'ACTION=iptables_tcp_accept ' --log-level 4
+$IPTABLES -A LOGACCEPT -p tcp -j ACCEPT 
+
+# Logging of all accepted udp traffic sent to this chain 
+$IPTABLES -A LOGACCEPT -p udp -j LOG --log-prefix 'ACTION=iptables_udp_accept ' --log-level 4
+$IPTABLES -A LOGACCEPT -p udp -j ACCEPT 
+
+
+# Logging of all accepted tcp traffic sent to this chain 
+$IP6TABLES -N LOGACCEPT
+$IP6TABLES -A LOGACCEPT -p tcp -j LOG --log-prefix 'ACTION=ip6tables_tcp_accept ' --log-level 4
+$IP6TABLES -A LOGACCEPT -p tcp -j ACCEPT 
+
+# Logging of all accepted udp traffic sent to this chain 
+$IP6TABLES -A LOGACCEPT -p udp -j LOG --log-prefix 'ACTION=ip6tables_udp_accept ' --log-level 4
+$IP6TABLES -A LOGACCEPT -p udp -j ACCEPT 
+
+# Routing, from KVM VM 
+#$IPTABLES -A INPUT -i virbr1 -j ACCEPT 
+#$IPTABLES -A FORWARD -i virbr1 -s 192.168.100.0/24 -d 0.0.0.0/0 -m state --state NEW -j ACCEPT
+#$IPTABLES -A FORWARD -i virbr1 -s 192.168.100.0/24 -d 0.0.0.0/0 -m state --state NEW -j ACCEPT
+#$IPTABLES -A FORWARD -i virbr1 -s 0.0.0.0/0 -d 192.168.100.0/24 -m state --state ESTABLISHED,RELATED -j ACCEPT
+#$IPTABLES -t nat -A POSTROUTING -s 192.168.100.0/24 -j MASQUERADE
+
+# Blacklist ipv4 
+BLACKLIST=""
+for IP in $BLACKLIST
+do
+    $IPTABLES -A INPUT -s $IP -j DROP
+done
+
+# Blacklist ipv6 
+BLACKLIST=""
+for IP in $BLACKLIST
+do
+    $IP6TABLES -A INPUT -s $IP -j DROP
+done
+# +---------------------------------------------+
+# | End General Configuration                   |
+# | Below is the gateway rules                  | `'+,._________,-;'`'\_____\o/ 
+# |                                             |               ' `          o
+# +---------------------------------------------+                           / \
+
+#$IPTABLES -A INPUT -m state --state NEW -s 1.2.3.4/24 -p tcp --dport 5601 -j ACCEPT 
+iptables-save > /etc/iptables.save
