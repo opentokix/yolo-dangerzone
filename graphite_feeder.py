@@ -4,7 +4,7 @@
 import socket
 from time import time, sleep
 import random
-
+import thread 
 
 class Graphite(object):
     def __init__(self, host, port):
