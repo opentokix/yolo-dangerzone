@@ -22,7 +22,7 @@ def get_available_zones(route53):
     zones = response['HostedZones']
     for i in range(len(zones)):
         z[zones[i]['Name']] = zones[i]['Id']
-    if len(z) == 0:
+    if not z:
         logger.error("No zones possible")
         exit(1)
     else:
