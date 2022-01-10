@@ -23,6 +23,7 @@ def get_module_latest(name, forge):
         data_json = json.loads(response.read())
     except Exception as e:
         logger.error(f"Probelem with json: {e}")
+        exit(1)
     data = data_json['current_release']['version']
     return data
 
@@ -33,7 +34,10 @@ def get_module_latest(name, forge):
 def main(name, forge, all):
     if not all:
         d = get_module_latest(name, forge)
-    print(d)
+        print(d)
+    else:
+        logger.error("All flag is not implemented yet")
+        exit(1)
 
 if __name__ == '__main__':
     main()
