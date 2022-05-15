@@ -12,3 +12,7 @@ sleep 3
 rm -rf /var/lib/ceph/mon/  /var/lib/ceph/mgr/  /var/lib/ceph/mds/
 sleep 3
 pveceph purge
+sleep 3
+apt -y purge ceph-mon ceph-osd ceph-mgr ceph-mds
+rm /etc/init.d/ceph
+
