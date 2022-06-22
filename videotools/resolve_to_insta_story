@@ -1,0 +1,5 @@
+#!/bin/bash
+FILE=$1
+if [ -f $FILE ]; then 
+ffmpeg -i $FILE -c:v libx264 -pix_fmt yuv420p -crf 16 -force_key_frames 'expr:gte(t,n_forced/2)' -bf 2 -vf yadif -use_editlist 0 -movflags +faststart -c:a aac -q:a 1 -ac 2 -ar 48000 -f mp4 ${FILE}_youtube.mp4
+fi
