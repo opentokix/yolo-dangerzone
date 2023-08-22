@@ -32,6 +32,16 @@ case $1 in
         keylight --host kl-left.l.opentokix.com --color $WARM --brightness $MID
         keylight --host kl-right.l.opentokix.com --color $WARM --brightness $MID
     ;;
+    5)
+        echo "warm setting"
+        keylight --host kl-left.l.opentokix.com --brightness 5
+        keylight --host kl-right.l.opentokix.com --brightness 5
+    ;;
+    10)
+        echo "warm setting"
+        keylight --host kl-left.l.opentokix.com --brightness 10
+        keylight --host kl-right.l.opentokix.com --brightness 10
+    ;;
     low)
         echo "low setting"
         keylight --host kl-left.l.opentokix.com --brightness $LOW
