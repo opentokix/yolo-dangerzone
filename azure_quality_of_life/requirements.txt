@@ -5,3 +5,5 @@ azure-mgmt-core==1.4.0
 azure-mgmt-dns==8.1.0
 azure-mgmt-nspkg==3.0.2
 azure-nspkg==3.0.2
+msrest==0.7.1
+msrestazure==0.6.4
