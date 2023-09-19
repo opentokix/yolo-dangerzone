@@ -122,7 +122,7 @@ def ask_for_comfirmation():
   if answer == "y":
     return True
   else:
-      print("Good choice, bye!"")
+      print("Good choice, bye!")
       exit(1)
 
 if __name__ == '__main__':
