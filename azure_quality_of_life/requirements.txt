@@ -1,0 +1,7 @@
+azure-common==1.1.28
+azure-core==1.29.4
+azure-mgmt-common==0.20.0
+azure-mgmt-core==1.4.0
+azure-mgmt-dns==8.1.0
+azure-mgmt-nspkg==3.0.2
+azure-nspkg==3.0.2
