@@ -102,6 +102,7 @@ def add_rrset(dns_client, zone_id, fqdn, ip):
 @click.option('--verbose', is_flag=True, help='Verbose output')
 def main(ip, fqdn, verbose):
   """Add A or AAAA records to Azure DNS"""
+  ask_for_comfirmation()
   if verbose:
     logger.setLevel(logging.DEBUG)
   credentials, subscription_id = get_azure_principal()
@@ -111,6 +112,18 @@ def main(ip, fqdn, verbose):
   resource_group = get_resource_group_for_zone(dns_client, zone_id)
   add_rrset(dns_client, zone_id, fqdn, ip)
 
+def ask_for_comfirmation():
+  print("This is written blind, no testing, not even once")
+  print("DONT USE THIS TOOL!")
+  print("You have been warned!")
+  print("=====================================")
+  print("This tool is totally untested, do you want to run (y/n):")
+  answer = input()
+  if answer == "y":
+    return True
+  else:
+      print("Good choice, bye!"")
+      exit(1)
 
 if __name__ == '__main__':
     main()
