@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "disable_existing_loggers": false,
+  "formatters": {
+      "simple": {
+          "format": "{\"timestamp\": \"%(asctime)s\", \"name\": \"%(name)s\", \"level\": \"%(levelname)s\", \"message\": \"%(message)s\"}",
+          "datefmt": "%Y-%m-%dT%H:%M:%S%z"
+      }
+  },
+  "handlers": {
+      "stdout": {
+          "class": "logging.StreamHandler",
+          "formatter": "simple",
+          "level": "DEBUG",
+          "stream": "ext://sys.stdout"
+      }
+  },
+  "loggers": {
+      "root": {
+          "level": "DEBUG",
+          "handlers": ["stdout"]
+      }
+  }
+}
