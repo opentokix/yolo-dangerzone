@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+"""
+This script send a document to victoria logs, that you can use in grafana as annotations. 
+With the victorialogs datasource you can use the annotations in your grafana dashboard.
+""" 
 import requests
 import json
 import click
