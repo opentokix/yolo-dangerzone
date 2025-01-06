@@ -16,28 +16,30 @@ handler = logging.StreamHandler()
 
 
 @click.command()
-@click.option('--invoker', envvar="INVOKER", type=str, required=True, help="Who triggered this command")
-@click.option('--tags', envvar="TAGS", type=str, required=False, default=None, help="List of tags for the annotation")
-@click.option('--message', envvar="MESSAGE", type=str, required=True, help="The message for the annotation")
-@click.option('--token', '-u', envvar="TOKEN", type=str, required=False, help="User for elastic search")
-@click.option('--host', '-H', envvar="HOST", type=str, required=True, default='localhost', help="Host of victorialogs server")
-@click.option('--port', '-P', envvar="PORT", type=str, required=False, default='443', help="port of victorialogs server")
-@click.option('--scheme', envvar="SCHEME", default='https', type=click.Choice(['http', 'https']), help="Use http or https")
-def main(invoker, tags, message, token, host, port, scheme):
-    if tags:
-        split_tags = tags.split(',')
-    uri = f"{scheme}://{host}:{port}/insert/jsonline"
+@click.option('--invoker', envvar="INVOKER", type=str, required=True, help="Who triggered this command")  # noqa E501
+@click.option('--tags', envvar="TAGS", type=str, required=False, default=None, help="List of tags for the annotation")  # noqa E501
+@click.option('--message', envvar="MESSAGE", type=str, required=True, help="The message for the annotation")  # noqa E501
+@click.option('--token', '-u', envvar="TOKEN", type=str, required=False, help="User for elastic search")  # noqa E501
+@click.option('--type_of', "-T", envvar="TYPE", required=True, type=click.Choice(['warning', 'ok', 'error', 'information', 'critical']), help="Type of the annotation")  # noqa E501
+@click.option('--system', '-s', envvar="SYSTEM", type=str, required=False, default="undefined", help="System for elastic search")  # noqa E501  # noqa E501
+@click.option('--host', '-H', envvar="HOST", type=str, required=True, default='localhost', help="Host of victorialogs server")  # noqa E501
+@click.option('--port', '-P', envvar="PORT", type=str, required=False, default='443', help="port of victorialogs server")  # noqa E501
+@click.option('--scheme', envvar="SCHEME", default='https', type=click.Choice(['http', 'https']), help="Use http or https")  # noqa E501
+def main(invoker, tags, message, token, host, port, scheme, system, type_of):
+    stream_fields = "stream,level,invoker,system,type_of"
+    uri = f"{scheme}://{host}:{port}/insert/jsonline?_stream_fields={stream_fields}"  # noqa E501
     headers = {
         "Content-Type": "application/stream+json",
         "Authorization": f"Bearer {token}"
     }
-    doc = {"other":
-           {"level": "info",
-            "invoker": invoker},
-           "date": "0",
+    doc = {"level": "info",
+           "invoker": invoker,
+           "system": system,
            "stream": "annotations",
+           "type": type_of,
            "_msg": message,
-           "tags": tags}
+           "tags": tags if tags else [],
+           }
     try:
         response = requests.post(uri, headers=headers, data=json.dumps(doc))
         response.raise_for_status()

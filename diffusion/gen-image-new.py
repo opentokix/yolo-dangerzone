@@ -17,7 +17,7 @@ def check_device():
     return "cpu"
 
 
-def get_pipeline(model_id="stabilityai/stable-diffusion-3.5-large-turbo"):
+def get_pipeline(model_id="):
     """Initialize the Stable Diffusion pipeline."""
     device = check_device()
 
