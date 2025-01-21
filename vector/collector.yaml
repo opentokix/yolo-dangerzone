@@ -1,0 +1,13 @@
+data_dir: /Users/peter/tmp/vector/data2
+sources:
+  syslog_src:
+    type: syslog 
+    address: 127.0.0.1:5140
+    mode: tcp 
+    path: /Users/peter/tmp/vector/vector.sock 
+sinks: 
+  vector_s:
+    type: vector 
+    inputs:
+      - syslog_src 
+    address: 127.0.0.1:9000
