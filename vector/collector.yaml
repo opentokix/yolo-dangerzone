@@ -11,3 +11,8 @@ sinks:
     inputs:
       - syslog_src 
     address: 127.0.0.1:9000
+#    path: /some/path/strict/folder 
+#    buffer:
+#      type: disk 
+#      max_size: 50000 # bytes 
+#      when_full: block 
