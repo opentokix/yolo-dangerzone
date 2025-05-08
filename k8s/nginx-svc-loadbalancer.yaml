@@ -1,0 +1,61 @@
+---
+# nginx-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.28-alpine  # smallest current stable tag
+          ports:
+            - containerPort: 80
+          readinessProbe:           # only send traffic when ready
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:            # restart hung Pods
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          resources:                # conservative starter limits
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"
+---
+# nginx-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-lb
+  labels:
+    app: nginx
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+  #   networking.gke.io/load-balancer-type: "External"
+spec:
+  selector:
+    app: nginx
+  type: LoadBalancer             # tells the control‑plane to provision a LB
+  ports:
+    - name: http
+      port: 80                   # cluster‑visible port
+      targetPort: 80             # Pod containerPort
