@@ -1,0 +1,6 @@
+      - op: add
+        path: /data/BOING
+        value: boing
+      - op: add
+        path: /data/BLORP
+        value: unifiedblorp

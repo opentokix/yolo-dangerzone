@@ -1,0 +1,15 @@
+apiVersion: builtin
+kind: ReplacementTransformer
+metadata:
+  name: configmap-one
+replacements:
+  - source:
+      kind: ConfigMap
+      name: cluster-properties
+      fieldPath: data.cluster-name
+    targets:
+      - select:
+          kind: ConfigMap
+          name: one-configmap
+        fieldPaths:
+          - data.CLUSTER_NAME
